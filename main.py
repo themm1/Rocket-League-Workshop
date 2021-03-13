@@ -74,5 +74,6 @@ class downloadMap:
         os.remove(f"{self.map_id}.zip")
 
 
-#loadmap = loadMap(r'E:\Rocket\rocketleague\TAGame\CookedPCConsole', "TrainingShop.udk")
-download = downloadMap("https://steamcommunity.com/sharedfiles/filedetails/?id=2347189620&searchtext=")
+#loadmap = loadMap(r'E:\Rocket\rocketleague\TAGame\CookedPCConsole', "gpeppersRings.udk")
+#loadmap.load_map()
+#download = downloadMap("https://steamcommunity.com/sharedfiles/filedetails/?id=2347189620&searchtext=")

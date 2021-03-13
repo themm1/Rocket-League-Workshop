@@ -1,3 +1,4 @@
 .vscode/
 Map Files/
 venv/
+__pycache__/
