@@ -23,20 +23,18 @@ class MyApp:
         downloadButton.place(relx=1, y=0, anchor="ne")
 
     def makeTable(self):
+        self.RL_PATH = r'E:\Rocket\rocketleague\TAGame\CookedPCConsole'
         maps = self.listFiles("./Map Files/")
         frame = LabelFrame(self.root, text="Maps", padx=5, pady=5)
-
-        def load(map_title):
-            load = loadMap(r'E:\Rocket\rocketleague\TAGame\CookedPCConsole', map_title)
-            load.load_map()
 
         buttons = []
         for i in range(len(maps)):
             for j in range(len(maps[i])):
                 l = Label(frame, text=maps[i][j], padx=50)
                 l.grid(row=i, column=j)
-            map_file = maps[i][0]
-            buttons.append(Button(frame, text="Load", padx=50, command=lambda file=maps[i][0]:load(file)))
+        
+            buttons.append(Button(frame, text="Load", padx=50,
+                command=lambda file=maps[i][0]:loadMap(self.RL_PATH, file)))
             buttons[i].grid(row=i, column=2)
 
         return frame
