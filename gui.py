@@ -13,6 +13,7 @@ class MyApp:
         self.root.mainloop()
 
     def initUI(self):
+        self.maps = listFiles("./Map Files/")
         self.pop_maps = listCSV("maps.csv")
 
         def searchAction():
@@ -22,14 +23,20 @@ class MyApp:
             self.frame = self.downloadMapsTable(result)
             self.frame.pack(padx=10, pady=35)
 
-        self.frame = self.downloadMapsTable(self.pop_maps)
+        def changeFrame(load_func):
+            self.frame.destroy()
+            self.frame = load_func
+            self.frame.pack(padx=10, pady=35)
+
+        self.frame = self.loadMapsTable()
         text_input = Entry(self.root, width=30, borderwidth=5)
 
-        searchButton = Button(self.root, text="Search", padx=20,
-            command=searchAction)
+        searchButton = Button(self.root, text="Search", padx=20, command=searchAction)
 
-        loadMapButton = Button(self.root, text="Load Map", padx=20)
-        downloadButton = Button(self.root, text="Download Map", padx=20)
+        loadMapButton = Button(self.root, text="Load Map", padx=20,
+            command=lambda: changeFrame(self.loadMapsTable()))
+        downloadButton = Button(self.root, text="Download Map", padx=20,
+            command=lambda: changeFrame(self.downloadMapsTable(self.pop_maps)))
 
         self.frame.pack(padx=10, pady=35)
         text_input.place(relx=0.01, rely=0.01, anchor="nw")
@@ -43,13 +50,13 @@ class MyApp:
         frame = LabelFrame(self.root, text="Maps", padx=5, pady=5)
 
         buttons = []
-        for i in range(len(maps)):
-            for j in range(len(maps[i])):
-                l = Label(frame, text=maps[i][j], padx=50)
+        for i in range(len(self.maps)):
+            for j in range(len(self.maps[i])):
+                l = Label(frame, text=self.maps[i][j], padx=50)
                 l.grid(row=i, column=j)
         
             buttons.append(Button(frame, text="Load", padx=50,
-                command=lambda file=maps[i][0]:loadMap(self.RL_PATH, file)))
+                command=lambda file=self.maps[i][0]: loadMap(self.RL_PATH, file)))
             buttons[i].grid(row=i, column=2)
 
         return frame
@@ -65,7 +72,7 @@ class MyApp:
                 l.grid(row=i, column=j)
         
             buttons.append(Button(frame, text="Download", padx=10,
-                command=lambda map_id=maps[i][2]:downloadMap(map_id)))
+                command=lambda map_id=maps[i][2]: downloadMap(map_id)))
             buttons[i].grid(row=i, column=3)
 
         return frame
