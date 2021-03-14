@@ -1,14 +1,19 @@
 import os
 import csv
+import string
 from os import listdir
 from tkinter import *
+from tkinter import filedialog
 from main import loadMap, downloadMap
 
 
 class MyApp:
     def __init__(self):
+        with open("rlpath.txt", "r") as f:
+            self.RL_PATH = f.readline()
         self.root = Tk(className="Rocket League Workshop")
         self.root.geometry("700x500")
+        self.root.resizable(False, False)
         self.initUI()
         self.root.mainloop()
 
@@ -28,6 +33,14 @@ class MyApp:
             self.frame = load_func
             self.frame.pack(padx=10, pady=80)
 
+        def changeRL_PATH():
+            rl_path = filedialog.askdirectory(initialdir="/", title="Select Rocket League Folder")
+            rl_path = f"{rl_path}/TAGame/CookedPCConsole/"
+            self.RL_PATH = r'{}'.format(rl_path.replace("/", "\\"))
+            print(self.RL_PATH)
+            with open("rlpath.txt", "w") as f:
+                f.writelines(self.RL_PATH)
+
         self.frame = self.loadMapsTable()
         textInput = Entry(self.root, width=30, borderwidth=5)
         searchButton = Button(self.root, text="Search", padx=20, command=searchAction)
@@ -36,7 +49,10 @@ class MyApp:
             command=lambda: changeFrame(self.loadMapsTable()))
         popularMapsButton = Button(self.root, text="Popular Maps", padx=20,
             command=lambda: changeFrame(self.downloadMapsTable(self.pop_maps)))
-
+        
+        changeRLDirButton = Button(self.root, text="Change rocket league folder",
+            command=changeRL_PATH)
+    
         downloadInput = Entry(self.root, width=70, borderwidth=5)
         downloadButton = Button(self.root, text="Download", padx=20,
             command=lambda: downloadMap(downloadInput.get()))
@@ -49,11 +65,11 @@ class MyApp:
         textInput.place(relx=0.01, rely=0.01, anchor="nw")
         searchButton.place(relx=0.29, rely=0.01, anchor="nw")
 
-        yourMapsButton.place(relx=0.8, rely=0.01, anchor="ne")
-        popularMapsButton.place(relx=0.99, rely=0.01, anchor="ne")
+        yourMapsButton.place(relx=0.57, rely=0.01, anchor="ne")
+        popularMapsButton.place(relx=0.75, rely=0.01, anchor="ne")
+        changeRLDirButton.place(relx=0.99, rely=0.01, anchor="ne")
 
     def loadMapsTable(self):
-        self.RL_PATH = r'E:\Rocket\rocketleague\TAGame\CookedPCConsole'
         self.maps = listFiles("./Map Files/")
         frame = LabelFrame(self.root, text="Maps", padx=5, pady=5)
 
@@ -109,6 +125,14 @@ def listCSV(file):
             maps.append(row)
     return maps
 
+def find_RL_PATH():
+    alphabet = list(string.ascii_uppercase)
+    for drive in reversed(alphabet):
+        for r, d, f in os.walk(f"{drive}:\\"):
+            if "rocketleague" in r:
+                return r
+
 
 if __name__ == "__main__":
     MyApp()
+    #print(find_RL_PATH())
