@@ -18,31 +18,39 @@ class MyApp:
 
         def searchAction():
             self.frame.destroy()
-            term = text_input.get()
+            term = textInput.get()
             result = search(self.pop_maps, term)
             self.frame = self.downloadMapsTable(result)
-            self.frame.pack(padx=10, pady=35)
+            self.frame.pack(padx=10, pady=80)
 
         def changeFrame(load_func):
             self.frame.destroy()
             self.frame = load_func
-            self.frame.pack(padx=10, pady=35)
+            self.frame.pack(padx=10, pady=80)
 
         self.frame = self.loadMapsTable()
-        text_input = Entry(self.root, width=30, borderwidth=5)
-
+        textInput = Entry(self.root, width=30, borderwidth=5)
         searchButton = Button(self.root, text="Search", padx=20, command=searchAction)
 
-        loadMapButton = Button(self.root, text="Load Map", padx=20,
+        yourMapsButton = Button(self.root, text="Your Maps", padx=20,
             command=lambda: changeFrame(self.loadMapsTable()))
-        downloadButton = Button(self.root, text="Download Map", padx=20,
+        popularMapsButton = Button(self.root, text="Popular Maps", padx=20,
             command=lambda: changeFrame(self.downloadMapsTable(self.pop_maps)))
 
-        self.frame.pack(padx=10, pady=35)
-        text_input.place(relx=0.01, rely=0.01, anchor="nw")
+        downloadInput = Entry(self.root, width=70, borderwidth=5)
+        downloadButton = Button(self.root, text="Download", padx=20,
+            command=lambda: downloadMap(downloadInput.get()))
+
+        self.frame.pack(padx=10, pady=80)
+
+        downloadInput.place(relx=0.43, rely=0.09, anchor="n")
+        downloadButton.place(relx=0.9, rely=0.09, anchor="ne")
+
+        textInput.place(relx=0.01, rely=0.01, anchor="nw")
         searchButton.place(relx=0.29, rely=0.01, anchor="nw")
-        loadMapButton.place(relx=0.8, rely=0.01, anchor="ne")
-        downloadButton.place(relx=0.99, rely=0.01, anchor="ne")
+
+        yourMapsButton.place(relx=0.8, rely=0.01, anchor="ne")
+        popularMapsButton.place(relx=0.99, rely=0.01, anchor="ne")
 
     def loadMapsTable(self):
         self.RL_PATH = r'E:\Rocket\rocketleague\TAGame\CookedPCConsole'
