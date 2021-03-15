@@ -46,41 +46,49 @@ class MyApp:
             rl_path = filedialog.askdirectory(initialdir="/", title="Select Rocket League Folder")
             rl_path = f"{rl_path}/TAGame/CookedPCConsole/"
             self.RL_PATH = r'{}'.format(rl_path.replace("/", "\\"))
-            print(self.RL_PATH)
             with open("rlpath.txt", "w") as f:
                 f.writelines(self.RL_PATH)
 
         self.frame = self.loadMapsTable(self.current_maps)
-        textInput = Entry(self.root, width=30, borderwidth=5)
-        searchButton = Button(self.root, text="Search", padx=20, command=searchAction)
+        self.menu = LabelFrame(self.root, padx=5, pady=5)
 
-        yourMapsButton = Button(self.root, text="Your Maps", padx=20,
+        textInput = Entry(self.menu, width=35, borderwidth=5)
+        searchButton = Button(self.menu, text="Search", command=searchAction)
+        searchButton.config(width = 12)
+
+        yourMapsButton = Button(self.menu, text="Your Maps",
             command=lambda: changeFrame(True))
-        popularMapsButton = Button(self.root, text="Popular Maps", padx=20,
+        yourMapsButton.config(width = 12)
+        popularMapsButton = Button(self.menu, text="Popular Maps",
             command=lambda: changeFrame(False))
+        popularMapsButton.config(width = 12)
         
-        changeRLDirButton = Button(self.root, text="Change rocket league folder",
+        changeRLDirButton = Button(self.menu, text="Change rocket league folder",
             command=changeRL_PATH)
+        changeRLDirButton.config(width = 25)
     
         downloadInput = Entry(self.root, width=70, borderwidth=5)
-        downloadButton = Button(self.root, text="Download", padx=20,
+        downloadButton = Button(self.root, text="Download",
             command=lambda: downloadMap(downloadInput.get()))
+        downloadButton.config(width = 12)
 
-        self.frame.pack(padx=10, pady=80)
+        self.menu.pack()
+        
+        textInput.grid(column=0, row=0)
+        searchButton.grid(column=1, row=0)
+
+        yourMapsButton.grid(column=2, row=0)
+        popularMapsButton.grid(column=3, row=0)
+        changeRLDirButton.grid(column=4, row=0)
 
         downloadInput.place(relx=0.43, rely=0.09, anchor="n")
         downloadButton.place(relx=0.9, rely=0.09, anchor="ne")
-
-        textInput.place(relx=0.01, rely=0.01, anchor="nw")
-        searchButton.place(relx=0.29, rely=0.01, anchor="nw")
-
-        yourMapsButton.place(relx=0.57, rely=0.01, anchor="ne")
-        popularMapsButton.place(relx=0.75, rely=0.01, anchor="ne")
-        changeRLDirButton.place(relx=0.99, rely=0.01, anchor="ne")
+        
+        self.frame.pack(padx=10, pady=60)
 
     def loadMapsTable(self, map_list):
         frame = LabelFrame(self.root, text="Maps", padx=5, pady=5)
-
+        
         buttons = []
         for i in range(len(map_list)):
             for j in range(len(map_list[i])):
