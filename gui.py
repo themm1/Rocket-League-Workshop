@@ -22,7 +22,7 @@ class MyApp:
         self.root.mainloop()
 
     def initUI(self):
-        def searchAction():
+        def searchAction(event=None):
             self.frame.destroy()
             term = textInput.get()
             result = search(self.current_maps, term)
@@ -30,7 +30,7 @@ class MyApp:
                 self.frame = self.loadMapsTable(result)
             else:
                 self.frame = self.downloadMapsTable(result)
-            self.frame.pack(padx=10, pady=80)
+            self.frame.pack(padx=10, pady=45)
 
         def changeFrame(load):
             self.frame.destroy()
@@ -40,7 +40,7 @@ class MyApp:
             else:
                 self.current_maps = self.pop_maps
                 self.frame = self.downloadMapsTable(self.current_maps)
-            self.frame.pack(padx=10, pady=80)
+            self.frame.pack(padx=10, pady=45)
 
         def changeRL_PATH():
             rl_path = filedialog.askdirectory(initialdir="/", title="Select Rocket League Folder")
@@ -53,6 +53,7 @@ class MyApp:
         self.menu = LabelFrame(self.root, padx=5, pady=5)
 
         textInput = Entry(self.menu, width=35, borderwidth=5)
+        textInput.bind("<Return>", searchAction)
         searchButton = Button(self.menu, text="Search", command=searchAction)
         searchButton.config(width = 12)
 
@@ -68,6 +69,7 @@ class MyApp:
         changeRLDirButton.config(width = 25)
     
         downloadInput = Entry(self.root, width=70, borderwidth=5)
+        downloadInput.bind("<Return>", lambda event: downloadMap(downloadInput.get()))
         downloadButton = Button(self.root, text="Download",
             command=lambda: downloadMap(downloadInput.get()))
         downloadButton.config(width = 12)
@@ -81,10 +83,10 @@ class MyApp:
         popularMapsButton.grid(column=3, row=0)
         changeRLDirButton.grid(column=4, row=0)
 
-        downloadInput.place(relx=0.43, rely=0.09, anchor="n")
-        downloadButton.place(relx=0.9, rely=0.09, anchor="ne")
+        downloadInput.place(relx=0.43, rely=0.1, anchor="n")
+        downloadButton.place(relx=0.88, rely=0.1, anchor="ne")
         
-        self.frame.pack(padx=10, pady=60)
+        self.frame.pack(padx=10, pady=45)
 
     def loadMapsTable(self, map_list):
         frame = LabelFrame(self.root, text="Maps", padx=5, pady=5)
@@ -111,7 +113,7 @@ class MyApp:
                 item = map_list[i][j]
                 if item.isnumeric():
                     l = Button(frame, text="Steam link", padx=10)
-                    l.bind("<Button-1>", lambda e, item=item: webbrowser.open_new(
+                    l.bind("<Button-1>", lambda event, item=item: webbrowser.open_new(
                         f"https://steamcommunity.com/sharedfiles/filedetails/?id={item}"))
                 else:
                     l = Label(frame, text=item)
