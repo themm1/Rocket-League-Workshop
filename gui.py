@@ -1,6 +1,7 @@
 import os
 import csv
 import string
+import webbrowser
 from os import listdir
 from tkinter import *
 from tkinter import filedialog
@@ -34,7 +35,7 @@ class MyApp:
         def changeFrame(load):
             self.frame.destroy()
             if load == True:
-                self.current_maps = self.maps
+                self.current_maps = listFiles("./Map Files/")
                 self.frame = self.loadMapsTable(self.current_maps)
             else:
                 self.current_maps = self.pop_maps
@@ -99,9 +100,14 @@ class MyApp:
         for i in range(len(map_list)):
             for j in range(len(map_list[i])):
                 frame.columnconfigure(j, minsize=100)
-                l = Label(frame, text=map_list[i][j])
+                item = map_list[i][j]
+                if item.isnumeric():
+                    l = Button(frame, text="Steam link", padx=10)
+                    l.bind("<Button-1>", lambda e, item=item: webbrowser.open_new(
+                        f"https://steamcommunity.com/sharedfiles/filedetails/?id={item}"))
+                else:
+                    l = Label(frame, text=item)
                 l.grid(row=i, column=j)
-        
             buttons.append(Button(frame, text="Download", padx=10,
                 command=lambda map_id=map_list[i][2]: downloadMap(map_id)))
             buttons[i].grid(row=i, column=3)
