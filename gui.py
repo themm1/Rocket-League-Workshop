@@ -16,7 +16,7 @@ class MyApp:
         self.pop_maps = listCSV("maps.csv")
         self.current_maps = self.maps
         self.root = Tk(className="Rocket League Workshop")
-        self.root.geometry("700x500")
+        self.root.geometry("750x500")
         self.root.resizable(False, False)
         self.initUI()
         self.root.mainloop()
@@ -52,7 +52,7 @@ class MyApp:
         self.frame = self.loadMapsTable(self.current_maps)
         self.menu = LabelFrame(self.root, padx=5, pady=5)
 
-        textInput = Entry(self.menu, width=35, borderwidth=5)
+        textInput = Entry(self.menu, width=27, font=("Arial", 13))
         textInput.bind("<Return>", searchAction)
         searchButton = Button(self.menu, text="Search", command=searchAction)
         searchButton.config(width = 12)
@@ -66,9 +66,9 @@ class MyApp:
         
         changeRLDirButton = Button(self.menu, text="Change rocket league folder",
             command=changeRL_PATH)
-        changeRLDirButton.config(width = 25)
+        changeRLDirButton.config(width = 22)
     
-        downloadInput = Entry(self.root, width=70, borderwidth=5)
+        downloadInput = Entry(self.root, width=53, font=("Arial", 13))
         downloadInput.bind("<Return>", lambda event: downloadMap(downloadInput.get()))
         downloadButton = Button(self.root, text="Download",
             command=lambda: downloadMap(downloadInput.get()))
@@ -77,14 +77,14 @@ class MyApp:
         self.menu.pack()
         
         textInput.grid(column=0, row=0)
-        searchButton.grid(column=1, row=0)
+        searchButton.grid(column=1, row=0, padx=(4, 15))
 
         yourMapsButton.grid(column=2, row=0)
         popularMapsButton.grid(column=3, row=0)
         changeRLDirButton.grid(column=4, row=0)
 
-        downloadInput.place(relx=0.43, rely=0.1, anchor="n")
-        downloadButton.place(relx=0.88, rely=0.1, anchor="ne")
+        downloadInput.place(relx=0.432, rely=0.1, anchor="n")
+        downloadButton.place(relx=0.885, rely=0.097, anchor="ne")
         
         self.frame.pack(padx=10, pady=45)
 
