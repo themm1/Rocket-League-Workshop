@@ -5,44 +5,44 @@ import webbrowser
 from os import listdir
 from tkinter import *
 from tkinter import filedialog
-from main import loadMap, downloadMap
+from main import load_map, downloadMap
 
 
-class MyApp:
+class RocketLeagueWorkshop:
     def __init__(self):
         with open("rlpath.txt", "r") as f:
             self.RL_PATH = f.readline()
-        self.maps = listFiles("./Map Files/")
-        self.pop_maps = listCSV("maps.csv")
+        self.maps = list_files("./Map Files/")
+        self.pop_maps = list_csv("maps.csv")
         self.current_maps = self.maps
         self.root = Tk(className="Rocket League Workshop")
         self.root.geometry("750x500")
         self.root.resizable(False, False)
-        self.initUI()
+        self.init_ui()
         self.root.mainloop()
 
-    def initUI(self):
-        def searchAction(event=None):
+    def init_ui(self):
+        def search_action(event=None):
             self.frame.destroy()
-            term = textInput.get()
+            term = text_input.get()
             result = search(self.current_maps, term)
             if len(self.current_maps[0]) == 2:
-                self.frame = self.loadMapsTable(result)
+                self.frame = self.your_maps_table(result)
             else:
-                self.frame = self.downloadMapsTable(result)
+                self.frame = self.popular_maps_table(result)
             self.frame.pack(padx=10, pady=45)
 
-        def changeFrame(load):
+        def change_frame(load):
             self.frame.destroy()
             if load:
-                self.current_maps = listFiles("./Map Files/")
-                self.frame = self.loadMapsTable(self.current_maps)
+                self.current_maps = list_files("./Map Files/")
+                self.frame = self.your_maps_table(self.current_maps)
             else:
                 self.current_maps = self.pop_maps
-                self.frame = self.downloadMapsTable(self.current_maps)
+                self.frame = self.popular_maps_table(self.current_maps)
             self.frame.pack(padx=10, pady=45)
 
-        def changeRL_PATH():
+        def change_rlpath():
             rl_path = filedialog.askdirectory(initialdir="/", title="Select Rocket League Folder")
             if rl_path != "":
                 rl_path = f"{rl_path}/TAGame/CookedPCConsole/"
@@ -50,46 +50,46 @@ class MyApp:
                 with open("rlpath.txt", "w") as f:
                     f.writelines(self.RL_PATH)
 
-        self.frame = self.loadMapsTable(self.current_maps)
+        self.frame = self.your_maps_table(self.current_maps)
         self.menu = LabelFrame(self.root, padx=5, pady=5)
 
-        textInput = Entry(self.menu, width=27, font=("Arial", 13))
-        textInput.bind("<Return>", searchAction)
-        searchButton = Button(self.menu, text="Search", command=searchAction)
-        searchButton.config(width = 12)
+        text_input = Entry(self.menu, width=27, font=("Arial", 13))
+        text_input.bind("<Return>", search_action)
+        search_button = Button(self.menu, text="Search", command=search_action)
+        search_button.config(width = 12)
 
-        yourMapsButton = Button(self.menu, text="Your Maps",
-            command=lambda: changeFrame(True))
-        yourMapsButton.config(width = 12)
-        popularMapsButton = Button(self.menu, text="Popular Maps",
-            command=lambda: changeFrame(False))
-        popularMapsButton.config(width = 12)
+        your_maps_button = Button(self.menu, text="Your Maps",
+            command=lambda: change_frame(True))
+        your_maps_button.config(width = 12)
+        popular_maps_button = Button(self.menu, text="Popular Maps",
+            command=lambda: change_frame(False))
+        popular_maps_button.config(width = 12)
         
-        changeRLDirButton = Button(self.menu, text="Change rocket league folder",
-            command=changeRL_PATH)
-        changeRLDirButton.config(width = 22)
+        change_rl_dir_button = Button(self.menu, text="Change rocket league folder",
+            command=change_rlpath)
+        change_rl_dir_button.config(width = 22)
     
-        downloadInput = Entry(self.root, width=53, font=("Arial", 13))
-        downloadInput.bind("<Return>", lambda event: downloadMap(downloadInput.get()))
-        downloadButton = Button(self.root, text="Download",
-            command=lambda: downloadMap(downloadInput.get()))
-        downloadButton.config(width = 12)
+        download_input = Entry(self.root, width=53, font=("Arial", 13))
+        download_input.bind("<Return>", lambda event: downloadMap(download_input.get()))
+        download_button = Button(self.root, text="Download",
+            command=lambda: downloadMap(download_input.get()))
+        download_button.config(width = 12)
 
         self.menu.pack()
         
-        textInput.grid(column=0, row=0)
-        searchButton.grid(column=1, row=0, padx=(4, 15))
+        text_input.grid(column=0, row=0)
+        search_button.grid(column=1, row=0, padx=(4, 15))
 
-        yourMapsButton.grid(column=2, row=0)
-        popularMapsButton.grid(column=3, row=0)
-        changeRLDirButton.grid(column=4, row=0)
+        your_maps_button.grid(column=2, row=0)
+        popular_maps_button.grid(column=3, row=0)
+        change_rl_dir_button.grid(column=4, row=0)
 
-        downloadInput.place(relx=0.432, rely=0.1, anchor="n")
-        downloadButton.place(relx=0.885, rely=0.097, anchor="ne")
+        download_input.place(relx=0.432, rely=0.1, anchor="n")
+        download_button.place(relx=0.885, rely=0.097, anchor="ne")
         
         self.frame.pack(padx=10, pady=45)
 
-    def loadMapsTable(self, map_list):
+    def your_maps_table(self, map_list):
         frame = LabelFrame(self.root, text="Maps", padx=5, pady=5)
         
         buttons = []
@@ -100,12 +100,12 @@ class MyApp:
                 l.grid(row=i, column=j)
         
             buttons.append(Button(frame, text="Load", width=10,
-                command=lambda file=map_list[i][0]: loadMap(self.RL_PATH, file)))
+                command=lambda file=map_list[i][0]: load_map(self.RL_PATH, file)))
             buttons[i].grid(row=i, column=2)
 
         return frame
 
-    def downloadMapsTable(self, map_list):
+    def popular_maps_table(self, map_list):
         frame = LabelFrame(self.root, text="Popular Worshop Maps", padx=5, pady=5)
 
         buttons = []
@@ -113,7 +113,7 @@ class MyApp:
             for j in range(len(map_list[i])):
                 frame.columnconfigure(j, minsize=100)
                 item = map_list[i][j]
-                if item.isnumeric():
+                if item.isnumeric() and j == 2:
                     l = Button(frame, text="Steam link", width=10)
                     l.bind("<Button-1>", lambda event, item=item: webbrowser.open_new(
                         f"https://steamcommunity.com/sharedfiles/filedetails/?id={item}"))
@@ -134,7 +134,7 @@ def search(map_list, term):
             result.append(file_name)
     return result
 
-def listFiles(directory):
+def list_files(directory):
     maps = []
     for file in os.listdir(directory):
         if file.endswith(".udk"):
@@ -142,7 +142,7 @@ def listFiles(directory):
             maps.append([file, f"{round(size / 1000000, 2)} MB"])
     return maps
 
-def listCSV(file):
+def list_csv(file):
     maps = []
     with open(file) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
@@ -150,7 +150,7 @@ def listCSV(file):
             maps.append(row)
     return maps
 
-def find_RL_PATH():
+def find_rlpath():
     alphabet = list(string.ascii_uppercase)
     for drive in reversed(alphabet):
         for r, d, f in os.walk(f"{drive}:\\"):
@@ -159,5 +159,5 @@ def find_RL_PATH():
 
 
 if __name__ == "__main__":
-    MyApp()
+    RocketLeagueWorkshop()
     #print(find_RL_PATH())

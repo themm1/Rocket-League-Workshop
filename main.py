@@ -8,7 +8,7 @@ import zipfile
 import requests
 
 
-def loadMap(RL_PATH, map_title):
+def load_map(RL_PATH, map_title):
     PATH = pathlib.Path(__file__).parent.absolute()
     shutil.copyfile(r'{}\Map Files\{}'.format(PATH, map_title),
         r'{}Labs_Underpass_P.upk'.format(RL_PATH))
