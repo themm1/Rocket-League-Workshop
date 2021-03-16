@@ -34,7 +34,7 @@ class MyApp:
 
         def changeFrame(load):
             self.frame.destroy()
-            if load == True:
+            if load:
                 self.current_maps = listFiles("./Map Files/")
                 self.frame = self.loadMapsTable(self.current_maps)
             else:
@@ -44,10 +44,11 @@ class MyApp:
 
         def changeRL_PATH():
             rl_path = filedialog.askdirectory(initialdir="/", title="Select Rocket League Folder")
-            rl_path = f"{rl_path}/TAGame/CookedPCConsole/"
-            self.RL_PATH = r'{}'.format(rl_path.replace("/", "\\"))
-            with open("rlpath.txt", "w") as f:
-                f.writelines(self.RL_PATH)
+            if rl_path != "":
+                rl_path = f"{rl_path}/TAGame/CookedPCConsole/"
+                self.RL_PATH = r'{}'.format(rl_path.replace("/", "\\"))
+                with open("rlpath.txt", "w") as f:
+                    f.writelines(self.RL_PATH)
 
         self.frame = self.loadMapsTable(self.current_maps)
         self.menu = LabelFrame(self.root, padx=5, pady=5)
@@ -94,10 +95,11 @@ class MyApp:
         buttons = []
         for i in range(len(map_list)):
             for j in range(len(map_list[i])):
-                l = Label(frame, text=map_list[i][j], padx=50)
+                frame.columnconfigure(j, minsize=100)
+                l = Label(frame, text=map_list[i][j])
                 l.grid(row=i, column=j)
         
-            buttons.append(Button(frame, text="Load", padx=50,
+            buttons.append(Button(frame, text="Load", width=10,
                 command=lambda file=map_list[i][0]: loadMap(self.RL_PATH, file)))
             buttons[i].grid(row=i, column=2)
 
@@ -112,13 +114,13 @@ class MyApp:
                 frame.columnconfigure(j, minsize=100)
                 item = map_list[i][j]
                 if item.isnumeric():
-                    l = Button(frame, text="Steam link", padx=10)
+                    l = Button(frame, text="Steam link", width=10)
                     l.bind("<Button-1>", lambda event, item=item: webbrowser.open_new(
                         f"https://steamcommunity.com/sharedfiles/filedetails/?id={item}"))
                 else:
                     l = Label(frame, text=item)
                 l.grid(row=i, column=j)
-            buttons.append(Button(frame, text="Download", padx=10,
+            buttons.append(Button(frame, text="Download", width=10,
                 command=lambda map_id=map_list[i][2]: downloadMap(map_id)))
             buttons[i].grid(row=i, column=3)
 
