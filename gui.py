@@ -2,7 +2,6 @@ import os
 import csv
 import string
 import webbrowser
-from os import listdir
 from tkinter import *
 from tkinter import filedialog
 from main import load_map, downloadMap
@@ -18,6 +17,8 @@ class RocketLeagueWorkshop:
         self.root = Tk(className="Rocket League Workshop")
         self.root.geometry("750x500")
         self.root.resizable(False, False)
+        self.frame = self.your_maps_table(self.current_maps)
+        self.menu = LabelFrame(self.root, padx=5, pady=5)
         self.init_ui()
         self.root.mainloop()
 
@@ -50,32 +51,30 @@ class RocketLeagueWorkshop:
                 with open("rlpath.txt", "w") as f:
                     f.writelines(self.RL_PATH)
 
-        self.frame = self.your_maps_table(self.current_maps)
-        self.menu = LabelFrame(self.root, padx=5, pady=5)
-
         text_input = Entry(self.menu, width=27, font=("Arial", 13))
         text_input.bind("<Return>", search_action)
         search_button = Button(self.menu, text="Search", command=search_action)
-        search_button.config(width = 12)
+        search_button.config(width=12)
 
         your_maps_button = Button(self.menu, text="Your Maps",
             command=lambda: change_frame(True))
-        your_maps_button.config(width = 12)
+        your_maps_button.config(width=12)
         popular_maps_button = Button(self.menu, text="Popular Maps",
             command=lambda: change_frame(False))
-        popular_maps_button.config(width = 12)
+        popular_maps_button.config(width=12)
         
         change_rl_dir_button = Button(self.menu, text="Change rocket league folder",
             command=change_rlpath)
-        change_rl_dir_button.config(width = 22)
+        change_rl_dir_button.config(width=22)
     
         download_input = Entry(self.root, width=53, font=("Arial", 13))
         download_input.bind("<Return>", lambda event: downloadMap(download_input.get()))
         download_button = Button(self.root, text="Download",
             command=lambda: downloadMap(download_input.get()))
-        download_button.config(width = 12)
+        download_button.config(width=12)
 
         self.menu.pack()
+        self.frame.pack(padx=10, pady=45)
         
         text_input.grid(column=0, row=0)
         search_button.grid(column=1, row=0, padx=(4, 15))
@@ -86,8 +85,6 @@ class RocketLeagueWorkshop:
 
         download_input.place(relx=0.432, rely=0.1, anchor="n")
         download_button.place(relx=0.885, rely=0.097, anchor="ne")
-        
-        self.frame.pack(padx=10, pady=45)
 
     def your_maps_table(self, map_list):
         frame = LabelFrame(self.root, text="Maps", padx=5, pady=5)
@@ -106,7 +103,7 @@ class RocketLeagueWorkshop:
         return frame
 
     def popular_maps_table(self, map_list):
-        frame = LabelFrame(self.root, text="Popular Worshop Maps", padx=5, pady=5)
+        frame = LabelFrame(self.root, text="Popular Workshop Maps", padx=5, pady=5)
 
         buttons = []
         for i in range(len(map_list)):
@@ -134,6 +131,7 @@ def search(map_list, term):
             result.append(file_name)
     return result
 
+
 def list_files(directory):
     maps = []
     for file in os.listdir(directory):
@@ -142,6 +140,7 @@ def list_files(directory):
             maps.append([file, f"{round(size / 1000000, 2)} MB"])
     return maps
 
+
 def list_csv(file):
     maps = []
     with open(file) as csv_file:
@@ -149,6 +148,7 @@ def list_csv(file):
         for row in csv_reader:
             maps.append(row)
     return maps
+
 
 def find_rlpath():
     alphabet = list(string.ascii_uppercase)
@@ -160,4 +160,3 @@ def find_rlpath():
 
 if __name__ == "__main__":
     RocketLeagueWorkshop()
-    #print(find_RL_PATH())
