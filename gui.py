@@ -26,22 +26,23 @@ class RocketLeagueWorkshop:
     def init_ui(self):
         def search_action(event=None):
             self.frame.destroy()
-            self.load_content()
             term = text_input.get()
-            result = search(self.current_maps, term)
+            results = search(self.current_maps, term)
             if len(self.current_maps[0]) == 2:
-                self.your_maps_table(result)
+                self.load_content()
+                self.your_maps_table(results)
             else:
-                self.popular_maps_table(result)
+                self.load_content(width=470)
+                self.popular_maps_table(results)
 
         def change_frame(load, maps_list):
             self.frame.destroy()
-            self.load_content()
-
             self.current_maps = maps_list
             if load:
+                self.load_content()
                 self.your_maps_table(maps_list)
             else:
+                self.load_content(width=470)
                 self.popular_maps_table(maps_list)
 
         def change_rlpath():
@@ -86,7 +87,7 @@ class RocketLeagueWorkshop:
         download_input.place(relx=0.432, rely=0.1, anchor="n")
         download_button.place(relx=0.885, rely=0.097, anchor="ne")
 
-    def load_content(self):
+    def load_content(self, width=None):
         def wheel_scroll(event):
             scroll_size = int(-1*(event.delta/120))
             canvas.yview_scroll(scroll_size, "units")
@@ -94,7 +95,7 @@ class RocketLeagueWorkshop:
         self.frame = LabelFrame(self.root, text="Maps", width=400, height=600)
         self.frame.pack(padx=10, pady=45)
 
-        canvas = Canvas(self.frame)
+        canvas = Canvas(self.frame, height=600, width=width)
         canvas.pack(side="left", fill="both")
 
         self.scrollbar = Scrollbar(self.frame, orient="vertical",
@@ -152,9 +153,9 @@ def search(map_list, term):
 def list_files(directory):
     maps = []
     for file in os.listdir(directory):
-        #if file.endswith(".udk"):
-        size = os.path.getsize(f"{directory}{file}")
-        maps.append([file, f"{round(size / 1000000, 2)} MB"])
+        if file.endswith(".udk"):
+            size = os.path.getsize(f"{directory}{file}")
+            maps.append([file, f"{round(size / 1000000, 2)} MB"])
     return maps
 
 
