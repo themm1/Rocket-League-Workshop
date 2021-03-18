@@ -17,31 +17,32 @@ class RocketLeagueWorkshop:
         self.root = Tk(className="Rocket League Workshop")
         self.root.geometry("750x500")
         self.root.resizable(False, False)
-        self.frame = self.your_maps_table(self.current_maps)
         self.menu = LabelFrame(self.root, padx=5, pady=5)
         self.init_ui()
+        self.load_content()
+        self.your_maps_table(self.current_maps)
         self.root.mainloop()
 
     def init_ui(self):
         def search_action(event=None):
             self.frame.destroy()
+            self.load_content()
             term = text_input.get()
             result = search(self.current_maps, term)
             if len(self.current_maps[0]) == 2:
-                self.frame = self.your_maps_table(result)
+                self.your_maps_table(result)
             else:
-                self.frame = self.popular_maps_table(result)
-            self.frame.pack(padx=10, pady=45)
+                self.popular_maps_table(result)
 
-        def change_frame(load):
+        def change_frame(load, maps_list):
             self.frame.destroy()
+            self.load_content()
+
+            self.current_maps = maps_list
             if load:
-                self.current_maps = list_files("./Map Files/")
-                self.frame = self.your_maps_table(self.current_maps)
+                self.your_maps_table(maps_list)
             else:
-                self.current_maps = self.pop_maps
-                self.frame = self.popular_maps_table(self.current_maps)
-            self.frame.pack(padx=10, pady=45)
+                self.popular_maps_table(maps_list)
 
         def change_rlpath():
             rl_path = filedialog.askdirectory(initialdir="/", title="Select Rocket League Folder")
@@ -57,10 +58,10 @@ class RocketLeagueWorkshop:
         search_button.config(width=12)
 
         your_maps_button = Button(self.menu, text="Your Maps",
-            command=lambda: change_frame(True))
+            command=lambda: change_frame(True, list_files("./Map Files/")))
         your_maps_button.config(width=12)
         popular_maps_button = Button(self.menu, text="Popular Maps",
-            command=lambda: change_frame(False))
+            command=lambda: change_frame(False, self.pop_maps))
         popular_maps_button.config(width=12)
         
         change_rl_dir_button = Button(self.menu, text="Change rocket league folder",
@@ -74,7 +75,6 @@ class RocketLeagueWorkshop:
         download_button.config(width=12)
 
         self.menu.pack()
-        self.frame.pack(padx=10, pady=45)
         
         text_input.grid(column=0, row=0)
         search_button.grid(column=1, row=0, padx=(4, 15))
@@ -86,42 +86,59 @@ class RocketLeagueWorkshop:
         download_input.place(relx=0.432, rely=0.1, anchor="n")
         download_button.place(relx=0.885, rely=0.097, anchor="ne")
 
+    def load_content(self):
+        def wheel_scroll(event):
+            scroll_size = int(-1*(event.delta/120))
+            canvas.yview_scroll(scroll_size, "units")
+
+        self.frame = LabelFrame(self.root, text="Maps", width=400, height=600)
+        self.frame.pack(padx=10, pady=45)
+
+        canvas = Canvas(self.frame)
+        canvas.pack(side="left", fill="both")
+
+        self.scrollbar = Scrollbar(self.frame, orient="vertical",
+            command=canvas.yview)
+        self.scrollbar.pack(side="right", fill="y")
+
+        canvas.configure(yscrollcommand=self.scrollbar.set)
+        canvas.bind("<Configure>", lambda event: canvas.configure(
+            scrollregion=canvas.bbox("all")))
+        canvas.bind_all("<MouseWheel>", wheel_scroll)
+
+        self.content = Frame(canvas)
+
+        canvas.create_window((0, 0), window=self.content, anchor="nw")
+
     def your_maps_table(self, map_list):
-        frame = LabelFrame(self.root, text="Maps", padx=5, pady=5)
-        
         buttons = []
         for i in range(len(map_list)):
             for j in range(len(map_list[i])):
-                frame.columnconfigure(j, minsize=100)
-                l = Label(frame, text=map_list[i][j])
+                self.content.columnconfigure(j, minsize=100)
+                l = Label(self.content, text=map_list[i][j])
                 l.grid(row=i, column=j)
         
-            buttons.append(Button(frame, text="Load", width=10,
+            buttons.append(Button(self.content, text="Load", width=10,
                 command=lambda file=map_list[i][0]: load_map(self.RL_PATH, file)))
             buttons[i].grid(row=i, column=2)
 
-        return frame
-
     def popular_maps_table(self, map_list):
-        frame = LabelFrame(self.root, text="Popular Workshop Maps", padx=5, pady=5)
-
         buttons = []
         for i in range(len(map_list)):
             for j in range(len(map_list[i])):
-                frame.columnconfigure(j, minsize=100)
+                self.content.columnconfigure(j, minsize=100)
                 item = map_list[i][j]
                 if item.isnumeric() and j == 2:
-                    l = Button(frame, text="Steam link", width=10)
+                    l = Button(self.content, text="Steam link", width=10)
                     l.bind("<Button-1>", lambda event, item=item: webbrowser.open_new(
                         f"https://steamcommunity.com/sharedfiles/filedetails/?id={item}"))
                 else:
-                    l = Label(frame, text=item)
+                    l = Label(self.content, text=item)
                 l.grid(row=i, column=j)
-            buttons.append(Button(frame, text="Download", width=10,
+                
+            buttons.append(Button(self.content, text="Download", width=10,
                 command=lambda map_id=map_list[i][2]: downloadMap(map_id)))
             buttons[i].grid(row=i, column=3)
-
-        return frame
 
 
 def search(map_list, term):
@@ -135,9 +152,9 @@ def search(map_list, term):
 def list_files(directory):
     maps = []
     for file in os.listdir(directory):
-        if file.endswith(".udk"):
-            size = os.path.getsize(f"{directory}{file}")
-            maps.append([file, f"{round(size / 1000000, 2)} MB"])
+        #if file.endswith(".udk"):
+        size = os.path.getsize(f"{directory}{file}")
+        maps.append([file, f"{round(size / 1000000, 2)} MB"])
     return maps
 
 
