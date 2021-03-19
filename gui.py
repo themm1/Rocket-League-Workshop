@@ -21,7 +21,6 @@ class RocketLeagueWorkshop:
         self.root.resizable(False, False)
 
         self.init_ui()
-        self.load_content()
         self.your_maps_table(self.current_maps)
 
         self.root.mainloop()
@@ -56,6 +55,7 @@ class RocketLeagueWorkshop:
                     f.writelines(self.RL_PATH)
 
         self.menu = Frame(self.root, padx=5, pady=5)
+        download_frame = Frame(self.root)
 
         text_input = ttk.Entry(self.menu, width=35, font=("Arial", 11))
         text_input.bind("<Return>", search_action)
@@ -68,28 +68,33 @@ class RocketLeagueWorkshop:
         popular_maps_button = ttk.Button(self.menu, text="Popular Maps",
             command=lambda: change_frame(False, self.pop_maps))
         popular_maps_button.config(width=13)
-        
+
         change_rl_dir_button = ttk.Button(self.menu, text="Change rocket league folder",
             command=change_rlpath)
         change_rl_dir_button.config(width=25)
     
-        download_input = ttk.Entry(self.root, width=63, font=("Arial", 11))
+        download_input = ttk.Entry(download_frame, width=80, font=("Arial", 11))
         download_input.bind("<Return>", lambda event: downloadMap(download_input.get()))
-        download_button = ttk.Button(self.root, text="Download",
+        download_button = ttk.Button(download_frame, text="Download",
             command=lambda: downloadMap(download_input.get()))
         download_button.config(width=12)
 
         self.menu.pack()
         
         text_input.grid(column=0, row=0)
-        search_button.grid(column=1, row=0, padx=(4, 15))
+        search_button.grid(column=1, row=0, padx=(0, 18))
 
         your_maps_button.grid(column=2, row=0)
         popular_maps_button.grid(column=3, row=0)
         change_rl_dir_button.grid(column=4, row=0)
 
-        download_input.place(relx=0.432, rely=0.1, anchor="n")
-        download_button.place(relx=0.885, rely=0.097, anchor="ne")
+        download_frame.pack(pady=(7, 0))
+
+        download_input.grid(column=0, row=0)
+        download_button.grid(column=1, row=0)
+
+        self.load_content()
+
 
     def load_content(self):
         def wheel_scroll(event):
@@ -97,7 +102,7 @@ class RocketLeagueWorkshop:
             canvas.yview_scroll(scroll_size, "units")
 
         self.frame = LabelFrame(self.root, text="Maps")
-        self.frame.pack(padx=10, pady=45)
+        self.frame.pack(padx=10, pady=(7, 7))
 
         canvas = Canvas(self.frame, height=600, width=700)
         canvas.pack(side="left", fill="both")
