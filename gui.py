@@ -117,9 +117,12 @@ class RocketLeagueWorkshop:
         buttons = []
         for i in range(len(map_list)):
             for j in range(len(map_list[i])):
-                self.content.columnconfigure(j, minsize=150)
-                l = Label(self.content, text=map_list[i][j][:80])
-                l.grid(row=i, column=j)
+                if j == 0:
+                    self.content.columnconfigure(j, minsize=510)
+                else:
+                    self.content.columnconfigure(j, minsize=100)
+                l = Label(self.content, text=map_list[i][j][:85])
+                l.grid(row=i, column=j, sticky="W")
         
             buttons.append(Button(self.content, text="Load", width=10,
                 command=lambda file=map_list[i][0]: load_map(self.RL_PATH, file)))
@@ -129,15 +132,18 @@ class RocketLeagueWorkshop:
         buttons = []
         for i in range(len(map_list)):
             for j in range(len(map_list[i])):
-                self.content.columnconfigure(j, minsize=150)
                 item = map_list[i][j]
+                if j == 0:
+                    self.content.columnconfigure(j, minsize=410)
+                else:
+                    self.content.columnconfigure(j, minsize=100)
                 if item.isnumeric() and j == 2:
                     l = Button(self.content, text="Steam link", width=10)
                     l.bind("<Button-1>", lambda event, item=item: webbrowser.open_new(
                         f"https://steamcommunity.com/sharedfiles/filedetails/?id={item}"))
                 else:
-                    l = Label(self.content, text=item[:50])
-                l.grid(row=i, column=j)
+                    l = Label(self.content, text=item[:70])
+                l.grid(row=i, column=j, sticky="W")
                 
             buttons.append(Button(self.content, text="Download", width=10,
                 command=lambda map_id=map_list[i][2]: downloadMap(map_id)))
