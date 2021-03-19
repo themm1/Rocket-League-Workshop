@@ -14,13 +14,15 @@ class RocketLeagueWorkshop:
         self.maps = list_files("./Map Files/")
         self.pop_maps = list_csv("maps.csv")
         self.current_maps = self.maps
+
         self.root = Tk(className="Rocket League Workshop")
         self.root.geometry("750x500")
         self.root.resizable(False, False)
-        self.menu = LabelFrame(self.root, padx=5, pady=5)
+
         self.init_ui()
         self.load_content()
         self.your_maps_table(self.current_maps)
+
         self.root.mainloop()
 
     def init_ui(self):
@@ -28,21 +30,20 @@ class RocketLeagueWorkshop:
             self.frame.destroy()
             term = text_input.get()
             results = search(self.current_maps, term)
+            self.load_content()
+
             if len(self.current_maps[0]) == 2:
-                self.load_content()
                 self.your_maps_table(results)
             else:
-                self.load_content(width=470)
                 self.popular_maps_table(results)
 
         def change_frame(load, maps_list):
             self.frame.destroy()
             self.current_maps = maps_list
+            self.load_content()
             if load:
-                self.load_content()
                 self.your_maps_table(maps_list)
             else:
-                self.load_content(width=470)
                 self.popular_maps_table(maps_list)
 
         def change_rlpath():
@@ -52,6 +53,8 @@ class RocketLeagueWorkshop:
                 self.RL_PATH = r'{}'.format(rl_path.replace("/", "\\"))
                 with open("rlpath.txt", "w") as f:
                     f.writelines(self.RL_PATH)
+
+        self.menu = LabelFrame(self.root, padx=5, pady=5)
 
         text_input = Entry(self.menu, width=27, font=("Arial", 13))
         text_input.bind("<Return>", search_action)
@@ -87,36 +90,35 @@ class RocketLeagueWorkshop:
         download_input.place(relx=0.432, rely=0.1, anchor="n")
         download_button.place(relx=0.885, rely=0.097, anchor="ne")
 
-    def load_content(self, width=None):
+    def load_content(self):
         def wheel_scroll(event):
             scroll_size = int(-1*(event.delta/120))
             canvas.yview_scroll(scroll_size, "units")
 
-        self.frame = LabelFrame(self.root, text="Maps", width=400, height=600)
+        self.frame = LabelFrame(self.root, text="Maps")
         self.frame.pack(padx=10, pady=45)
 
-        canvas = Canvas(self.frame, height=600, width=width)
+        canvas = Canvas(self.frame, height=600, width=700)
         canvas.pack(side="left", fill="both")
 
-        self.scrollbar = Scrollbar(self.frame, orient="vertical",
+        yscrollbar = Scrollbar(self.frame, orient="vertical",
             command=canvas.yview)
-        self.scrollbar.pack(side="right", fill="y")
+        yscrollbar.pack(side="right", fill="y")
 
-        canvas.configure(yscrollcommand=self.scrollbar.set)
+        canvas.configure(yscrollcommand=yscrollbar.set)
         canvas.bind("<Configure>", lambda event: canvas.configure(
             scrollregion=canvas.bbox("all")))
         canvas.bind_all("<MouseWheel>", wheel_scroll)
 
         self.content = Frame(canvas)
-
         canvas.create_window((0, 0), window=self.content, anchor="nw")
 
     def your_maps_table(self, map_list):
         buttons = []
         for i in range(len(map_list)):
             for j in range(len(map_list[i])):
-                self.content.columnconfigure(j, minsize=100)
-                l = Label(self.content, text=map_list[i][j])
+                self.content.columnconfigure(j, minsize=150)
+                l = Label(self.content, text=map_list[i][j][:80])
                 l.grid(row=i, column=j)
         
             buttons.append(Button(self.content, text="Load", width=10,
@@ -127,14 +129,14 @@ class RocketLeagueWorkshop:
         buttons = []
         for i in range(len(map_list)):
             for j in range(len(map_list[i])):
-                self.content.columnconfigure(j, minsize=100)
+                self.content.columnconfigure(j, minsize=150)
                 item = map_list[i][j]
                 if item.isnumeric() and j == 2:
                     l = Button(self.content, text="Steam link", width=10)
                     l.bind("<Button-1>", lambda event, item=item: webbrowser.open_new(
                         f"https://steamcommunity.com/sharedfiles/filedetails/?id={item}"))
                 else:
-                    l = Label(self.content, text=item)
+                    l = Label(self.content, text=item[:50])
                 l.grid(row=i, column=j)
                 
             buttons.append(Button(self.content, text="Download", width=10,
