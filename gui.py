@@ -5,7 +5,7 @@ import webbrowser
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
-from main import load_map, downloadMap
+from load_map import load_map, downloadMap
 
 
 class RocketLeagueWorkshop:
@@ -15,6 +15,9 @@ class RocketLeagueWorkshop:
         self.maps = list_files("./Map Files/")
         self.pop_maps = list_csv("maps.csv")
         self.current_maps = self.maps
+
+        self.FONT_SIZE = 11
+        self.BUTTON_SIZE = 13
 
         self.root = Tk(className="Rocket League Workshop")
         self.root.geometry("750x500")
@@ -47,37 +50,37 @@ class RocketLeagueWorkshop:
                 self.popular_maps_table(maps_list)
 
         def change_rlpath():
-            rl_path = filedialog.askdirectory(initialdir="/", title="Select Rocket League Folder")
+            rl_path = filedialog.askdirectory(initialdir="/", 
+                title="Select Rocket League maps folder (usually rocketleague/TAGame/CookedPCConsole)")
             if rl_path != "":
-                rl_path = f"{rl_path}/TAGame/CookedPCConsole/"
-                self.RL_PATH = r'{}'.format(rl_path.replace("/", "\\"))
+                self.RL_PATH = rl_path
                 with open("rlpath.txt", "w") as f:
                     f.writelines(self.RL_PATH)
 
         self.menu = Frame(self.root, padx=5, pady=5)
         download_frame = Frame(self.root)
 
-        text_input = ttk.Entry(self.menu, width=35, font=("Arial", 11))
+        text_input = ttk.Entry(self.menu, width=35, font=("Arial", self.FONT_SIZE))
         text_input.bind("<Return>", search_action)
         search_button = ttk.Button(self.menu, text="Search", command=search_action)
-        search_button.config(width=13)
+        search_button.config(width=self.BUTTON_SIZE)
 
         your_maps_button = ttk.Button(self.menu, text="Your Maps",
             command=lambda: change_frame(True, list_files("./Map Files/")))
-        your_maps_button.config(width=13)
+        your_maps_button.config(width=self.BUTTON_SIZE)
         popular_maps_button = ttk.Button(self.menu, text="Popular Maps",
             command=lambda: change_frame(False, self.pop_maps))
-        popular_maps_button.config(width=13)
+        popular_maps_button.config(width=self.BUTTON_SIZE)
 
         change_rl_dir_button = ttk.Button(self.menu, text="Change rocket league folder",
             command=change_rlpath)
         change_rl_dir_button.config(width=25)
     
-        download_input = ttk.Entry(download_frame, width=80, font=("Arial", 11))
+        download_input = ttk.Entry(download_frame, width=79, font=("Arial", self.FONT_SIZE))
         download_input.bind("<Return>", lambda event: downloadMap(download_input.get()))
         download_button = ttk.Button(download_frame, text="Download",
             command=lambda: downloadMap(download_input.get()))
-        download_button.config(width=12)
+        download_button.config(width=self.BUTTON_SIZE)
 
         self.menu.pack()
         
@@ -130,7 +133,7 @@ class RocketLeagueWorkshop:
                 l = ttk.Label(self.content, text=map_list[i][j][:85])
                 l.grid(row=i, column=j, sticky="W")
         
-            buttons.append(ttk.Button(self.content, text="Load", width=12,
+            buttons.append(ttk.Button(self.content, text="Load", width=self.BUTTON_SIZE,
                 command=lambda file=map_list[i][0]: load_map(self.RL_PATH, file)))
             buttons[i].grid(row=i, column=2)
 
@@ -144,14 +147,14 @@ class RocketLeagueWorkshop:
                 else:
                     self.content.columnconfigure(j, minsize=100)
                 if item.isnumeric() and j == 2:
-                    l = ttk.Button(self.content, text="Steam link", width=12)
+                    l = ttk.Button(self.content, text="Steam link", width=self.BUTTON_SIZE)
                     l.bind("<Button-1>", lambda event, item=item: webbrowser.open_new(
                         f"https://steamcommunity.com/sharedfiles/filedetails/?id={item}"))
                 else:
-                    l = Label(self.content, text=item[:70])
+                    l = Label(self.content, text=item[:68])
                 l.grid(row=i, column=j, sticky="W")
                 
-            buttons.append(ttk.Button(self.content, text="Download", width=12,
+            buttons.append(ttk.Button(self.content, text="Download", width=self.BUTTON_SIZE,
                 command=lambda map_id=map_list[i][2]: downloadMap(map_id)))
             buttons[i].grid(row=i, column=3)
 
@@ -167,7 +170,7 @@ def search(map_list, term):
 def list_files(directory):
     maps = []
     for file in os.listdir(directory):
-        if file.endswith(".udk"):
+        if file.endswith(".udk") or file.endswith(".upk"):
             size = os.path.getsize(f"{directory}{file}")
             maps.append([file, f"{round(size / 1000000, 2)} MB"])
     return maps

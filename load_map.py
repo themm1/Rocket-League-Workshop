@@ -61,16 +61,3 @@ class downloadMap:
                 if file.endswith(".udk"):
                     f.extract(file, "./Map Files/")
         os.remove(f"{self.map_id}.zip")
-
-'''
-def make_backup(RL_PATH):
-    underpass = r'{}\Labs_Underpass_P.upk'.format(RL_PATH)
-    size = os.path.getsize(underpass)
-    if size > 2200000 and size < 2210000:
-        os.rename(underpass, 
-            r'{}\Labs_Underpass_P_BACKUP.upk'.format(RL_PATH))
-'''
-
-#loadmap = loadMap(r'E:\Rocket\rocketleague\TAGame\CookedPCConsole', "gpeppersRings.udk")
-#loadmap.load_map()
-#download = downloadMap("https://steamcommunity.com/sharedfiles/filedetails/?id=2347189620&searchtext=")
