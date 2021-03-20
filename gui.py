@@ -3,9 +3,8 @@ import csv
 import string
 import webbrowser
 from tkinter import *
-from tkinter import ttk
-from tkinter import filedialog
 from load_map import load_map, downloadMap
+from tkinter import ttk, filedialog, messagebox
 
 
 class RocketLeagueWorkshop:
@@ -57,6 +56,13 @@ class RocketLeagueWorkshop:
                 with open("rlpath.txt", "w") as f:
                     f.writelines(self.RL_PATH)
 
+        def download_map_try(map_id):
+            try:
+                downloadMap(map_id)
+            except Exception:
+                messagebox.showerror("Error popup", 
+                    "Couldn't download the map, check the URL of the map")
+
         self.menu = Frame(self.root, padx=5, pady=5)
         download_frame = Frame(self.root)
 
@@ -79,7 +85,7 @@ class RocketLeagueWorkshop:
         download_input = ttk.Entry(download_frame, width=79, font=("Arial", self.FONT_SIZE))
         download_input.bind("<Return>", lambda event: downloadMap(download_input.get()))
         download_button = ttk.Button(download_frame, text="Download",
-            command=lambda: downloadMap(download_input.get()))
+            command=lambda: download_map_try(download_input.get()))
         download_button.config(width=self.BUTTON_SIZE)
 
         self.menu.pack()
@@ -123,6 +129,13 @@ class RocketLeagueWorkshop:
         canvas.create_window((0, 0), window=self.content, anchor="nw")
 
     def your_maps_table(self, map_list):
+        def load_map_try(file):
+            try:
+                load_map(self.RL_PATH, file)
+            except Exception:
+                messagebox.showerror("Error popup", 
+                    "Couldn't load the map, try to change your Rocket League path in the top right corner")
+
         buttons = []
         for i in range(len(map_list)):
             for j in range(len(map_list[i])):
@@ -134,10 +147,17 @@ class RocketLeagueWorkshop:
                 l.grid(row=i, column=j, sticky="W")
         
             buttons.append(ttk.Button(self.content, text="Load", width=self.BUTTON_SIZE,
-                command=lambda file=map_list[i][0]: load_map(self.RL_PATH, file)))
+                command=lambda file=map_list[i][0]: load_map_try(file)))
             buttons[i].grid(row=i, column=2)
 
     def popular_maps_table(self, map_list):
+        def download_map_try(map_id):
+            try:
+                downloadMap(map_id)
+            except Exception:
+                messagebox.showerror("Error popup", 
+                    "Couldn't download the map, check your internet connection")
+
         buttons = []
         for i in range(len(map_list)):
             for j in range(len(map_list[i])):
@@ -146,7 +166,7 @@ class RocketLeagueWorkshop:
                     self.content.columnconfigure(j, minsize=410)
                 else:
                     self.content.columnconfigure(j, minsize=100)
-                if item.isnumeric() and j == 2:
+                if j == 2:
                     l = ttk.Button(self.content, text="Steam link", width=self.BUTTON_SIZE)
                     l.bind("<Button-1>", lambda event, item=item: webbrowser.open_new(
                         f"https://steamcommunity.com/sharedfiles/filedetails/?id={item}"))
@@ -155,7 +175,7 @@ class RocketLeagueWorkshop:
                 l.grid(row=i, column=j, sticky="W")
                 
             buttons.append(ttk.Button(self.content, text="Download", width=self.BUTTON_SIZE,
-                command=lambda map_id=map_list[i][2]: downloadMap(map_id)))
+                command=lambda map_id=map_list[i][2]: download_map_try(map_id)))
             buttons[i].grid(row=i, column=3)
 
 
