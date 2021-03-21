@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import time
 import json
 import shutil
@@ -9,8 +10,11 @@ import requests
 
 
 def load_map(RL_PATH, map_title):
-    PATH = pathlib.Path(__file__).parent.absolute()
-    shutil.copyfile(r'{}\Map Files\{}'.format(PATH, map_title),
+    if getattr(sys, 'frozen', False):
+        path = os.path.dirname(sys.executable)
+    elif __file__:
+        path = os.path.dirname(__file__)
+    shutil.copyfile(r'{}\Map Files\{}'.format(path, map_title),
         r'{}/Labs_Underpass_P.upk'.format(RL_PATH))
 
 
