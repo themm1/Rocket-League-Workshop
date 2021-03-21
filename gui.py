@@ -21,6 +21,7 @@ class RocketLeagueWorkshop:
         self.root = Tk(className="Rocket League Workshop")
         self.root.geometry("750x500")
         self.root.resizable(False, False)
+        self.root.iconbitmap("rocketleague.ico")
 
         self.init_ui()
         self.your_maps_table(self.current_maps)
