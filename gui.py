@@ -203,6 +203,7 @@ def list_csv(file):
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             maps.append(row)
+    maps.pop(0)
     return maps
 
 
