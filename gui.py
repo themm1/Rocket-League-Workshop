@@ -57,6 +57,7 @@ class RocketLeagueWorkshop:
         def download_map_try(map_id):
             try:
                 downloadMap(map_id, self.config['mapfiles'])
+                messagebox.showinfo("Success", "Map successfully downloaded")
             except Exception:
                 messagebox.showerror("Error popup", 
                     "Couldn't download the map, check the URL of the map")
@@ -105,12 +106,19 @@ class RocketLeagueWorkshop:
                 self.config[key] = path
                 with open("config.json", "w") as outfile:
                     json.dump(self.config, outfile)
+                if key == "mapfiles":
+                    messagebox.showinfo("Success", "Map Files folder successfully changed")
+                elif key == "rocketleague":
+                    messagebox.showinfo("Success", "Rocket League path successfully changed")
 
         def move_mapfiles(key, path):
-            for filename in os.listdir(self.config[key]):
-                shutil.copy(f"{self.config[key]}/{filename}", path)
-                os.remove(f"{self.config[key]}/{filename}")
-            os.rmdir(self.config[key])
+            try:
+                for filename in os.listdir(self.config[key]):
+                    shutil.copy(f"{self.config[key]}/{filename}", path)
+                    os.remove(f"{self.config[key]}/{filename}")
+                os.rmdir(self.config[key])
+            except Exception:
+                pass
 
         self.options = Frame(self.root)
 
@@ -158,8 +166,8 @@ class RocketLeagueWorkshop:
             try:
                 load_map(self.config['rocketleague'], file)
             except Exception:
-                messagebox.showerror("Error popup", 
-                    "Couldn't load the map, try to change your Rocket League path in the top right corner")
+                messagebox.showerror("Error", 
+                    "Couldn't load the map, try to change your Rocket League path in the bottom right corner")
 
         buttons = []
         for i in range(len(map_list)):
@@ -177,14 +185,12 @@ class RocketLeagueWorkshop:
 
     def popular_maps_table(self, map_list):
         def download_map_try(map_id):
-            downloadMap(map_id, self.config['mapfiles'])
-            '''
             try:
-                downloadMap(map_id)
+                downloadMap(map_id, self.config['mapfiles'])
+                messagebox.showinfo("Success", "Map successfully downloaded")
             except Exception:
-                messagebox.showerror("Error popup", 
+                messagebox.showerror("Error", 
                     "Couldn't download the map, check your internet connection")
-            '''
 
         buttons = []
         for i in range(len(map_list)):
