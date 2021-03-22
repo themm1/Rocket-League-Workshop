@@ -52,7 +52,7 @@ class downloadMap:
             time.sleep(1)
         params = (("uuid", uuid),)
 
-        r = s.get("https://backend-01-prd.steamworkshopdownloader.io/api/download/transmit", params=params, stream=True)
+        r = s.get("https://backend-01-prd.steamworkshopdownloader.io/api/download/transmit", params=params, stream=True) 
         with open(f"./{self.map_id}.zip", "wb") as f:
             for chunk in r.iter_content(chunk_size=1024):
                 if chunk:
@@ -64,4 +64,4 @@ class downloadMap:
             for file in f.namelist():
                 if file.endswith(".udk"):
                     f.extract(file, "./Map Files/")
-        os.remove(f"{self.map_id}.zip")
+        os.remove(f"./{self.map_id}.zip")

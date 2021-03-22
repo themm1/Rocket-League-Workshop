@@ -153,11 +153,14 @@ class RocketLeagueWorkshop:
 
     def popular_maps_table(self, map_list):
         def download_map_try(map_id):
+            downloadMap(map_id)
+            '''
             try:
                 downloadMap(map_id)
             except Exception:
                 messagebox.showerror("Error popup", 
                     "Couldn't download the map, check your internet connection")
+            '''
 
         buttons = []
         for i in range(len(map_list)):
