@@ -49,6 +49,48 @@ class RocketLeagueWorkshop:
             else:
                 self.popular_maps_table(maps_list)
 
+        def download_map_try(map_id):
+            try:
+                downloadMap(map_id)
+            except Exception:
+                messagebox.showerror("Error popup", 
+                    "Couldn't download the map, check the URL of the map")
+
+        menu = Frame(self.root, padx=5, pady=5)
+        download_frame = Frame(self.root)
+
+        text_input = ttk.Entry(menu, width=40, font=("Arial", self.FONT_SIZE))
+        text_input.bind("<Return>", search_action)
+        search_button = ttk.Button(menu, text="Search", command=search_action)
+        search_button.config(width=self.BUTTON_SIZE)
+
+        your_maps_button = ttk.Button(menu, text="Your Maps",
+            command=lambda: change_frame(True, list_files("./Map Files/")))
+        your_maps_button.config(width=self.BUTTON_SIZE)
+        popular_maps_button = ttk.Button(menu, text="Popular Maps",
+            command=lambda: change_frame(False, self.pop_maps))
+        popular_maps_button.config(width=self.BUTTON_SIZE)
+    
+        download_input = ttk.Entry(download_frame, width=79, font=("Arial", self.FONT_SIZE))
+        download_input.bind("<Return>", lambda event: downloadMap(download_input.get()))
+        download_button = ttk.Button(download_frame, text="Download",
+            command=lambda: download_map_try(download_input.get()))
+        download_button.config(width=self.BUTTON_SIZE)
+
+        menu.pack()
+        text_input.grid(column=0, row=0)
+        search_button.grid(column=1, row=0, padx=(0, 136))
+        your_maps_button.grid(column=2, row=0)
+        popular_maps_button.grid(column=3, row=0)
+
+        download_frame.pack()
+        download_input.grid(column=0, row=0)
+        download_button.grid(column=1, row=0)
+
+        self.load_options()
+        self.load_content()
+
+    def load_options(self):
         def change_rlpath():
             rl_path = filedialog.askdirectory(initialdir="/", 
                 title="Select Rocket League maps folder (usually rocketleague/TAGame/CookedPCConsole)")
@@ -57,54 +99,19 @@ class RocketLeagueWorkshop:
                 with open("rlpath.txt", "w") as f:
                     f.writelines(self.RL_PATH)
 
-        def download_map_try(map_id):
-            try:
-                downloadMap(map_id)
-            except Exception:
-                messagebox.showerror("Error popup", 
-                    "Couldn't download the map, check the URL of the map")
+        self.options = Frame(self.root)
 
-        self.menu = Frame(self.root, padx=5, pady=5)
-        download_frame = Frame(self.root)
-
-        text_input = ttk.Entry(self.menu, width=35, font=("Arial", self.FONT_SIZE))
-        text_input.bind("<Return>", search_action)
-        search_button = ttk.Button(self.menu, text="Search", command=search_action)
-        search_button.config(width=self.BUTTON_SIZE)
-
-        your_maps_button = ttk.Button(self.menu, text="Your Maps",
-            command=lambda: change_frame(True, list_files("./Map Files/")))
-        your_maps_button.config(width=self.BUTTON_SIZE)
-        popular_maps_button = ttk.Button(self.menu, text="Popular Maps",
-            command=lambda: change_frame(False, self.pop_maps))
-        popular_maps_button.config(width=self.BUTTON_SIZE)
-
-        change_rl_dir_button = ttk.Button(self.menu, text="Change rocket league folder",
+        change_rl_dir_button = ttk.Button(self.options, text="Change Rocket League folder",
+        command=change_rlpath)
+        change_rl_dir_button.config(width=26)
+        change_maps_dir_button = ttk.Button(self.options, text="Change Map Files folder",
             command=change_rlpath)
-        change_rl_dir_button.config(width=25)
-    
-        download_input = ttk.Entry(download_frame, width=79, font=("Arial", self.FONT_SIZE))
-        download_input.bind("<Return>", lambda event: downloadMap(download_input.get()))
-        download_button = ttk.Button(download_frame, text="Download",
-            command=lambda: download_map_try(download_input.get()))
-        download_button.config(width=self.BUTTON_SIZE)
+        change_maps_dir_button.config(width=26)
 
-        self.menu.pack()
-        
-        text_input.grid(column=0, row=0)
-        search_button.grid(column=1, row=0, padx=(0, 18))
-
-        your_maps_button.grid(column=2, row=0)
-        popular_maps_button.grid(column=3, row=0)
-        change_rl_dir_button.grid(column=4, row=0)
-
-        download_frame.pack(pady=(7, 0))
-
-        download_input.grid(column=0, row=0)
-        download_button.grid(column=1, row=0)
-
-        self.load_content()
-
+        self.options.pack(pady=(5, 0))
+        self.options.columnconfigure(0, minsize=395)
+        change_maps_dir_button.grid(column=1, row=0)
+        change_rl_dir_button.grid(column=2, row=0)
 
     def load_content(self):
         def wheel_scroll(event):
@@ -112,9 +119,9 @@ class RocketLeagueWorkshop:
             canvas.yview_scroll(scroll_size, "units")
 
         self.frame = LabelFrame(self.root, text="Maps")
-        self.frame.pack(padx=10, pady=(7, 7))
+        self.frame.pack(padx=10)
 
-        canvas = Canvas(self.frame, height=600, width=700)
+        canvas = Canvas(self.frame, height=380, width=700)
         canvas.pack(side="left", fill="both")
 
         yscrollbar = Scrollbar(self.frame, orient="vertical",
@@ -128,6 +135,8 @@ class RocketLeagueWorkshop:
 
         self.content = Frame(canvas)
         canvas.create_window((0, 0), window=self.content, anchor="nw")
+        self.options.destroy()
+        self.load_options()
 
     def your_maps_table(self, map_list):
         def load_map_try(file):
