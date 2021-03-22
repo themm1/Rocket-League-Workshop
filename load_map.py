@@ -19,7 +19,8 @@ def load_map(RL_PATH, map_title):
 
 
 class downloadMap:
-    def __init__(self, link, unzip=True):
+    def __init__(self, link, mapfiles_folder, unzip=True):
+        self.mapfiles_folder = mapfiles_folder
         if link.isnumeric():
             self.map_id = link
         else:
@@ -63,5 +64,5 @@ class downloadMap:
         with zipfile.ZipFile(f"./{self.map_id}.zip", "r") as f:
             for file in f.namelist():
                 if file.endswith(".udk"):
-                    f.extract(file, "./Map Files/")
+                    f.extract(file, f"{self.mapfiles_folder}/")
         os.remove(f"./{self.map_id}.zip")
