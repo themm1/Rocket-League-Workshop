@@ -231,17 +231,19 @@ class RocketLeagueWorkshop:
             elif __file__:
                 path = os.path.dirname(__file__)
             path = path.replace("\\", "/")
-            self.config['mapfiles'] = f"{path}/Map Files"
+            return f"{path}/Map Files"
 
         if self.config['rocketleague'] == "":
             messagebox.showinfo(self.title, 
                 "Finding Rocket League folder, please wait a moment")
             self.config['rocketleague'] = find_rl_path()
-            self.write_config()
-            self.change_frame(True, list_files(self.config['mapfiles']))
+            try:
+                self.change_frame(True, list_files(self.config['mapfiles']))
+            except Exception:
+                pass
 
         if self.config['mapfiles'] == "":
-            find_mapfiles_path()
+            self.config['mapfiles'] = find_mapfiles_path()
             self.write_config()
             self.change_frame(True, list_files(self.config['mapfiles']))
     
