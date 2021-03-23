@@ -11,8 +11,17 @@ from tkinter import ttk, filedialog, messagebox
 
 class RocketLeagueWorkshop:
     def __init__(self):
+        self.title = "Rocket League Workshop"
+        self.FONT_SIZE = 11
+        self.BUTTON_SIZE = 13
+
+        self.root = Tk(className=self.title)
+        self.root.geometry("750x500")
+        self.root.resizable(False, False)
+        self.root.iconbitmap("rocketleague.ico")
+
         with open("config.json") as f:
-            self.config = json.load(f)
+            self.config = json.load(f) 
         try:
             self.maps = list_files(self.config['mapfiles'])
         except Exception:
@@ -20,17 +29,10 @@ class RocketLeagueWorkshop:
         self.pop_maps = list_csv("maps.csv")
         self.current_maps = self.maps
 
-        self.FONT_SIZE = 11
-        self.BUTTON_SIZE = 13
-
-        self.root = Tk(className="Rocket League Workshop")
-        self.root.geometry("750x500")
-        self.root.resizable(False, False)
-        self.root.iconbitmap("rocketleague.ico")
-
         self.init_ui()
         self.your_maps_table(self.current_maps)
 
+        self.root.after(100, self.config_setup)
         self.root.mainloop()
 
     def init_ui(self):
@@ -45,23 +47,6 @@ class RocketLeagueWorkshop:
             else:
                 self.popular_maps_table(results)
 
-        def change_frame(load, maps_list):
-            self.frame.destroy()
-            self.current_maps = maps_list
-            self.load_content()
-            if load:
-                self.your_maps_table(maps_list)
-            else:
-                self.popular_maps_table(maps_list)
-
-        def download_map_try(map_id):
-            try:
-                downloadMap(map_id, self.config['mapfiles'])
-                messagebox.showinfo("Success", "Map successfully downloaded")
-            except Exception:
-                messagebox.showerror("Error popup", 
-                    "Couldn't download the map, check the URL of the map")
-
         menu = Frame(self.root, padx=5, pady=5)
         download_frame = Frame(self.root)
 
@@ -71,17 +56,18 @@ class RocketLeagueWorkshop:
         search_button.config(width=self.BUTTON_SIZE)
 
         your_maps_button = ttk.Button(menu, text="Your Maps",
-            command=lambda: change_frame(True, list_files(self.config['mapfiles'])))
+            command=lambda: self.change_frame(True, list_files(self.config['mapfiles'])))
         your_maps_button.config(width=self.BUTTON_SIZE)
         popular_maps_button = ttk.Button(menu, text="Popular Maps",
-            command=lambda: change_frame(False, self.pop_maps))
+            command=lambda: self.change_frame(False, self.pop_maps))
         popular_maps_button.config(width=self.BUTTON_SIZE)
     
         download_input = ttk.Entry(download_frame, width=79, font=("Arial", self.FONT_SIZE))
         download_input.bind("<Return>", lambda event: downloadMap(
             download_input.get(), self.config['mapfiles']))
         download_button = ttk.Button(download_frame, text="Download",
-            command=lambda: download_map_try(download_input.get()))
+            command=lambda: self.download_map(download_input.get(), 
+                "Couldn't download the map, check the URL of the map"))
         download_button.config(width=self.BUTTON_SIZE)
 
         menu.pack()
@@ -97,19 +83,34 @@ class RocketLeagueWorkshop:
         self.load_options()
         self.load_content()
 
+    def download_map(self, map_id, error_message):
+        try:
+            downloadMap(map_id, self.config['mapfiles'])
+            messagebox.showinfo(self.title, "Map successfully downloaded")
+        except Exception:
+            messagebox.showerror(self.title, error_message)
+
+    def change_frame(self, load, maps_list):
+        self.frame.destroy()
+        self.current_maps = maps_list
+        self.load_content()
+        if load:
+            self.your_maps_table(maps_list)
+        else:
+            self.popular_maps_table(maps_list)
+
     def load_options(self):
         def change_config(key, text):
-            path = filedialog.askdirectory(initialdir=self.config[key], title=text)
+            path = filedialog.askdirectory(initialdir=os.path.dirname(self.config[key]), title=text)
             if path != "":
                 if key == "mapfiles":
                     move_mapfiles(key, path)
                 self.config[key] = path
-                with open("config.json", "w") as outfile:
-                    json.dump(self.config, outfile)
+                self.write_config()
                 if key == "mapfiles":
-                    messagebox.showinfo("Success", "Map Files folder successfully changed")
+                    messagebox.showinfo(self.title, "Map Files folder successfully changed")
                 elif key == "rocketleague":
-                    messagebox.showinfo("Success", "Rocket League path successfully changed")
+                    messagebox.showinfo(self.title, "Rocket League folder successfully changed")
 
         def move_mapfiles(key, path):
             try:
@@ -166,7 +167,7 @@ class RocketLeagueWorkshop:
             try:
                 load_map(self.config['rocketleague'], file)
             except Exception:
-                messagebox.showerror("Error", 
+                messagebox.showerror(self.title, 
                     "Couldn't load the map, try to change your Rocket League path in the bottom right corner")
 
         buttons = []
@@ -184,14 +185,6 @@ class RocketLeagueWorkshop:
             buttons[i].grid(row=i, column=2)
 
     def popular_maps_table(self, map_list):
-        def download_map_try(map_id):
-            try:
-                downloadMap(map_id, self.config['mapfiles'])
-                messagebox.showinfo("Success", "Map successfully downloaded")
-            except Exception:
-                messagebox.showerror("Error", 
-                    "Couldn't download the map, check your internet connection")
-
         buttons = []
         for i in range(len(map_list)):
             for j in range(len(map_list[i])):
@@ -209,9 +202,49 @@ class RocketLeagueWorkshop:
                 l.grid(row=i, column=j, sticky="W")
                 
             buttons.append(ttk.Button(self.content, text="Download", width=self.BUTTON_SIZE,
-                command=lambda map_id=map_list[i][2]: download_map_try(map_id)))
+                command=lambda map_id=map_list[i][2]: self.download_map(map_id, 
+                    "Couldn't download the map, check your internet connection")))
             buttons[i].grid(row=i, column=3)
 
+    def write_config(self):
+        with open("config.json", "w") as outfile:
+            json.dump(self.config, outfile)
+
+    def config_setup(self):
+        def find_rl_path():
+            alphabet = list(string.ascii_uppercase)
+            for drive in reversed(alphabet):
+                for r, d, f in os.walk(f"{drive}:\\"):
+                    if "rocketleague\\TAGame\\CookedPCConsole" in r:
+                        r = r.replace("\\", "/")
+                        messagebox.showinfo(self.title, 
+                            "Rocket League folder was successfully located")
+                        return r
+            else:
+                messagebox.showerror(self.title, 
+                    "Couldn't find Rocket League folder, try to locate it manually in the bottom right corner")
+                self.config['rocketleague'] = None
+
+        def find_mapfiles_path():
+            if getattr(sys, 'frozen', False):
+                path = os.path.dirname(sys.executable)
+            elif __file__:
+                path = os.path.dirname(__file__)
+            path = path.replace("\\", "/")
+            self.config['mapfiles'] = f"{path}/Map Files"
+
+        if self.config['rocketleague'] == "":
+            messagebox.showinfo(self.title, 
+                "Finding Rocket League folder, please wait a moment")
+            self.config['rocketleague'] = find_rl_path()
+            self.write_config()
+            self.change_frame(True, list_files(self.config['mapfiles']))
+
+        if self.config['mapfiles'] == "":
+            find_mapfiles_path()
+            self.write_config()
+            self.change_frame(True, list_files(self.config['mapfiles']))
+    
 
 def search(map_list, term):
     result = []
@@ -238,14 +271,6 @@ def list_csv(file):
             maps.append(row)
     maps.pop(0)
     return maps
-
-
-def find_rlpath():
-    alphabet = list(string.ascii_uppercase)
-    for drive in reversed(alphabet):
-        for r, d, f in os.walk(f"{drive}:\\"):
-            if "rocketleague" in r:
-                return r
 
 
 if __name__ == "__main__":

@@ -14,8 +14,7 @@ def load_map(RL_PATH, map_title):
         path = os.path.dirname(sys.executable)
     elif __file__:
         path = os.path.dirname(__file__)
-    shutil.copyfile(r'{}\Map Files\{}'.format(path, map_title),
-        r'{}/Labs_Underpass_P.upk'.format(RL_PATH))
+    shutil.copyfile(f"{path}\Map Files\{map_title}", f"{RL_PATH}/Labs_Underpass_P.upk")
 
 
 class downloadMap:
