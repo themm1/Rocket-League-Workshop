@@ -23,7 +23,7 @@ class RocketLeagueWorkshop:
         self.root = Tk(className=self.title)
         self.root.geometry("750x500")
         self.root.resizable(False, False)
-        self.root.iconbitmap("rocketleague.ico")
+        self.root.iconbitmap("./images/rocketleague.ico")
 
         with open("config.json") as f:
             self.config = json.load(f) 
