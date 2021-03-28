@@ -2,8 +2,9 @@ import os
 import re
 import csv
 import sys
-import time
 import json
+import time
+import ctypes
 import shutil
 import string
 import pathlib
@@ -16,15 +17,15 @@ from tkinter import ttk, filedialog, messagebox
 
 class RocketLeagueWorkshop:
     def __init__(self):
-        self.title = "Rocket League Workshop"
+        self.title = " Rocket League Workshop"
         self.FONT_SIZE = 11
         self.BUTTON_SIZE = 13
 
         self.root = Tk(className=self.title)
         self.root.geometry("750x500")
         self.root.resizable(False, False)
-        self.root.iconbitmap("./images/rocketleague.ico")
-
+        self.root.iconbitmap("./examples/rocketleague.ico")
+        
         with open("config.json") as f:
             self.config = json.load(f) 
         try:
@@ -68,7 +69,7 @@ class RocketLeagueWorkshop:
         popular_maps_button.config(width=self.BUTTON_SIZE)
     
         download_input = ttk.Entry(download_frame, width=79, font=("Arial", self.FONT_SIZE))
-        download_input.bind("<Return>", lambda event: downloadMap(
+        download_input.bind("<Return>", lambda event: self.download_map(
             download_input.get(), self.config['mapfiles']))
         download_button = ttk.Button(download_frame, text="Download",
             command=lambda: self.download_map(download_input.get(), 
@@ -89,8 +90,10 @@ class RocketLeagueWorkshop:
         self.load_content()
 
     def download_map(self, map_id, error_message):
+        self.make_popup("Downloading a map, please wait")
         try:
-            downloadMap(map_id, self.config['mapfiles'])
+            DownloadMap(map_id, self.config['mapfiles'])
+            self.popup.destroy()
             messagebox.showinfo(self.title, "Map successfully downloaded")
         except Exception:
             messagebox.showerror(self.title, error_message)
@@ -215,6 +218,21 @@ class RocketLeagueWorkshop:
         with open("config.json", "w") as outfile:
             json.dump(self.config, outfile)
 
+    def make_popup(self, text):
+        self.popup = Toplevel(self.root)
+        self.popup.title(self.title)
+        self.popup.iconbitmap("./examples/rocketleague.ico")
+        self.popup.configure(background="white")
+
+        self.popup.geometry(f"250x75")
+        self.root.eval(f'tk::PlaceWindow {str(self.popup)} center')
+        self.popup.resizable(False, False)
+
+        message = Label(self.popup, text=text)
+        message.place(rely=0.5, relx=0.5, anchor="center")
+        message.configure(background="white")
+        self.popup.update()
+
     def config_setup(self):
         def find_rl_path():
             alphabet = list(string.ascii_uppercase)
@@ -239,9 +257,10 @@ class RocketLeagueWorkshop:
             return f"{path}/Map Files"
 
         if self.config['rocketleague'] == "":
-            messagebox.showinfo(self.title, 
-                "Finding Rocket League folder, please wait a moment")
+            self.make_popup("Finding Rocket League folder, please wait")
             self.config['rocketleague'] = find_rl_path()
+            self.write_config()
+            self.popup.destroy()
             try:
                 self.change_frame(True, list_files(self.config['mapfiles']))
             except Exception:
@@ -280,7 +299,7 @@ def list_csv(file):
     return maps
 
 
-class downloadMap:
+class DownloadMap:
     def __init__(self, link, mapfiles_folder, unzip=True):
         self.mapfiles_folder = mapfiles_folder
         if link.isnumeric():
