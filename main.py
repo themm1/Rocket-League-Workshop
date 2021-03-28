@@ -62,10 +62,10 @@ class RocketLeagueWorkshop:
         search_button.config(width=self.BUTTON_SIZE)
 
         your_maps_button = ttk.Button(menu, text="Your Maps",
-            command=lambda: self.change_frame(True, list_files(self.config['mapfiles'])))
+            command=lambda: self.change_frame("yourmaps", list_files(self.config['mapfiles'])))
         your_maps_button.config(width=self.BUTTON_SIZE)
         popular_maps_button = ttk.Button(menu, text="Popular Maps",
-            command=lambda: self.change_frame(False, self.pop_maps))
+            command=lambda: self.change_frame("popmaps", self.pop_maps))
         popular_maps_button.config(width=self.BUTTON_SIZE)
     
         download_input = ttk.Entry(download_frame, width=79, font=("Arial", self.FONT_SIZE))
@@ -98,13 +98,13 @@ class RocketLeagueWorkshop:
         except Exception:
             messagebox.showerror(self.TITLE, error_message)
 
-    def change_frame(self, load, maps_list):
+    def change_frame(self, list_name, maps_list):
         self.frame.destroy()
         self.current_maps = maps_list
         self.load_content()
-        if load:
+        if list_name == "yourmaps":
             self.your_maps_table(maps_list)
-        else:
+        elif list_name == "popmaps":
             self.popular_maps_table(maps_list)
 
     def load_options(self):
@@ -119,14 +119,15 @@ class RocketLeagueWorkshop:
                     messagebox.showinfo(self.TITLE, "Map Files folder successfully changed")
                 elif key == "rocketleague":
                     messagebox.showinfo(self.TITLE, "Rocket League folder successfully changed")
-                self.change_frame(True, list_files(self.config['mapfiles']))
+                self.change_frame("yourmaps", list_files(self.config['mapfiles']))
 
         def move_mapfiles(key, path):
             try:
                 for subdir, dirs, files in os.walk(self.config[key]):
                     for file in files:
-                        shutil.copy(f"{self.config[key]}/{file}", path)
-                        os.remove(f"{self.config[key]}/{file}")
+                        if file.endswith(".udk") or file.endswith(".upk"):
+                            shutil.copy(f"{self.config[key]}/{file}", path)
+                            os.remove(f"{self.config[key]}/{file}")
                 os.rmdir(self.config[key])
             except Exception:
                 pass
@@ -239,13 +240,15 @@ class RocketLeagueWorkshop:
         def find_rl_path():
             alphabet = list(string.ascii_uppercase)
             for drive in reversed(alphabet):
-                for r, d, f in os.walk(f"{drive}:\\"):
-                    if "rocketleague\\TAGame\\CookedPCConsole" in r:
-                        r = r.replace("\\", "/")
+                for subdir, dirs, files in os.walk(f"{drive}:\\"):
+                    if "rocketleague\\TAGame\\CookedPCConsole" in subdir:
+                        path = subdir.replace("\\", "/")
+                        self.popup.destroy()
                         messagebox.showinfo(self.TITLE, 
                             "Rocket League folder was successfully located")
-                        return r
+                        return path
             else:
+                self.popup.destroy()
                 messagebox.showerror(self.TITLE, 
                     "Couldn't find Rocket League folder, try to locate it manually in the bottom right corner")
                 self.config['rocketleague'] = None
@@ -261,17 +264,15 @@ class RocketLeagueWorkshop:
         if self.config['rocketleague'] == "":
             self.make_popup("Finding Rocket League folder, please wait")
             self.config['rocketleague'] = find_rl_path()
-            self.write_config()
-            self.popup.destroy()
-            try:
-                self.change_frame(True, list_files(self.config['mapfiles']))
-            except Exception:
-                pass
 
         if self.config['mapfiles'] == "":
             self.config['mapfiles'] = find_mapfiles_path()
-            self.write_config()
-            self.change_frame(True, list_files(self.config['mapfiles']))
+
+        self.write_config()
+        try:
+            self.change_frame("yourmaps", list_files(self.config['mapfiles']))
+        except Exception:
+            pass
     
 
 def search(map_list, term):
@@ -314,6 +315,7 @@ class DownloadMap:
                 self.map_id = re.search('id=(.*)', link).group(1)
 
         self.map_id = int(self.map_id)
+        self.zip_map_path = f"{self.mapfiles_folder}/{self.map_id}.zip"
         self.download_map(unzip)
 
     def download_map(self, unzip):
@@ -338,18 +340,18 @@ class DownloadMap:
         params = (("uuid", uuid),)
 
         r = s.get("https://backend-01-prd.steamworkshopdownloader.io/api/download/transmit", params=params, stream=True) 
-        with open(f"./{self.map_id}.zip", "wb") as f:
+        with open(self.zip_map_path, "wb") as f:
             for chunk in r.iter_content(chunk_size=1024):
                 if chunk:
                     f.write(chunk)
         if unzip == True: self.unzip_file()
 
     def unzip_file(self):
-        with zipfile.ZipFile(f"./{self.map_id}.zip", "r") as f:
+        with zipfile.ZipFile(self.zip_map_path, "r") as f:
             for file in f.namelist():
                 if file.endswith(".udk"):
                     f.extract(file, f"{self.mapfiles_folder}/")
-        os.remove(f"./{self.map_id}.zip")
+        os.remove(self.zip_map_path)
 
 
 if __name__ == "__main__":
