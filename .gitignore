@@ -2,8 +2,6 @@
 Map Files/
 venv/
 __pycache__/
-config.json
 main.exe
 Output/
-rocketleague.ico
 setup.iss
