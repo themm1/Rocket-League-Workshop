@@ -4,7 +4,6 @@ import csv
 import sys
 import json
 import time
-import ctypes
 import shutil
 import string
 import pathlib
