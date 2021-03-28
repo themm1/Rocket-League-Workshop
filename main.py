@@ -17,11 +17,11 @@ from tkinter import ttk, filedialog, messagebox
 
 class RocketLeagueWorkshop:
     def __init__(self):
-        self.title = " Rocket League Workshop"
+        self.TITLE = " Rocket League Workshop"
         self.FONT_SIZE = 11
         self.BUTTON_SIZE = 13
 
-        self.root = Tk(className=self.title)
+        self.root = Tk(className=self.TITLE)
         self.root.geometry("750x500")
         self.root.resizable(False, False)
         self.root.iconbitmap("./examples/rocketleague.ico")
@@ -73,7 +73,7 @@ class RocketLeagueWorkshop:
             download_input.get(), self.config['mapfiles']))
         download_button = ttk.Button(download_frame, text="Download",
             command=lambda: self.download_map(download_input.get(), 
-                "Couldn't download the map, check the URL of the map"))
+            "Couldn't download the map, check the URL of the map"))
         download_button.config(width=self.BUTTON_SIZE)
 
         menu.pack()
@@ -94,9 +94,9 @@ class RocketLeagueWorkshop:
         try:
             DownloadMap(map_id, self.config['mapfiles'])
             self.popup.destroy()
-            messagebox.showinfo(self.title, "Map successfully downloaded")
+            messagebox.showinfo(self.TITLE, "Map successfully downloaded")
         except Exception:
-            messagebox.showerror(self.title, error_message)
+            messagebox.showerror(self.TITLE, error_message)
 
     def change_frame(self, load, maps_list):
         self.frame.destroy()
@@ -116,15 +116,17 @@ class RocketLeagueWorkshop:
                 self.config[key] = path
                 self.write_config()
                 if key == "mapfiles":
-                    messagebox.showinfo(self.title, "Map Files folder successfully changed")
+                    messagebox.showinfo(self.TITLE, "Map Files folder successfully changed")
                 elif key == "rocketleague":
-                    messagebox.showinfo(self.title, "Rocket League folder successfully changed")
+                    messagebox.showinfo(self.TITLE, "Rocket League folder successfully changed")
+                self.change_frame(True, list_files(self.config['mapfiles']))
 
         def move_mapfiles(key, path):
             try:
-                for filename in os.listdir(self.config[key]):
-                    shutil.copy(f"{self.config[key]}/{filename}", path)
-                    os.remove(f"{self.config[key]}/{filename}")
+                for subdir, dirs, files in os.walk(self.config[key]):
+                    for file in files:
+                        shutil.copy(f"{self.config[key]}/{file}", path)
+                        os.remove(f"{self.config[key]}/{file}")
                 os.rmdir(self.config[key])
             except Exception:
                 pass
@@ -175,7 +177,7 @@ class RocketLeagueWorkshop:
             try:
                 shutil.copyfile(f"{self.config['mapfiles']}\{file}", f"{self.config['rocketleague']}/Labs_Underpass_P.upk")
             except Exception:
-                messagebox.showerror(self.title, 
+                messagebox.showerror(self.TITLE, 
                     "Couldn't load the map, try to change your Rocket League path in the bottom right corner")
 
         buttons = []
@@ -220,7 +222,7 @@ class RocketLeagueWorkshop:
 
     def make_popup(self, text):
         self.popup = Toplevel(self.root)
-        self.popup.title(self.title)
+        self.popup.title(self.TITLE)
         self.popup.iconbitmap("./examples/rocketleague.ico")
         self.popup.configure(background="white")
 
@@ -240,11 +242,11 @@ class RocketLeagueWorkshop:
                 for r, d, f in os.walk(f"{drive}:\\"):
                     if "rocketleague\\TAGame\\CookedPCConsole" in r:
                         r = r.replace("\\", "/")
-                        messagebox.showinfo(self.title, 
+                        messagebox.showinfo(self.TITLE, 
                             "Rocket League folder was successfully located")
                         return r
             else:
-                messagebox.showerror(self.title, 
+                messagebox.showerror(self.TITLE, 
                     "Couldn't find Rocket League folder, try to locate it manually in the bottom right corner")
                 self.config['rocketleague'] = None
 
@@ -282,10 +284,11 @@ def search(map_list, term):
 
 def list_files(directory):
     maps = []
-    for file in os.listdir(directory):
-        if file.endswith(".udk") or file.endswith(".upk"):
-            size = os.path.getsize(f"{directory}/{file}")
-            maps.append([file, f"{round(size / 1000000, 2)} MB"])
+    for subdir, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith(".udk") or file.endswith(".upk"):
+                size = os.path.getsize(f"{directory}/{file}")
+                maps.append([file, f"{round(size / 1000000, 2)} MB"])
     return maps
 
 
