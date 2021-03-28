@@ -7,7 +7,7 @@ Rocket League Workshop is a desktop app made with Tkinter, for loading and downl
 To install the app you have to download setup at first.
 Run the setup, ignore the warning from Windows Smart Screen if it pops up.  
 **Please do NOT save the app to Program Files or Program Files (x86).**
-[**Direct Download link**](https://github.com/themm1/Rocket-League-Workshop/releases/download/v1.0/rlworkshop_setup.exe)
+[**Direct Download link**](https://github.com/themm1/Rocket-League-Workshop/releases/download/v1.1/rlworkshop_setup.exe)
 
 ## App Configuration
 As the program starts for the first time it automatically tries to locate your Rocket League folder. If it fails, locate your Rocket League folder manually by clicking a button in bottom right corner and than selecting the folder. Select maps folder 
