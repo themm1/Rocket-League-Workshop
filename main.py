@@ -23,7 +23,7 @@ class RocketLeagueWorkshop:
         self.root = Tk(className=self.TITLE)
         self.root.geometry("750x500")
         self.root.resizable(False, False)
-        self.root.iconbitmap("./images/rocketleague.ico")
+        self.root.iconbitmap("./rocketleague.ico")
         
         with open("config.json") as f:
             self.config = json.load(f) 
@@ -223,7 +223,7 @@ class RocketLeagueWorkshop:
     def make_popup(self, text):
         self.popup = Toplevel(self.root)
         self.popup.title(self.TITLE)
-        self.popup.iconbitmap("./images/rocketleague.ico")
+        self.popup.iconbitmap("./rocketleague.ico")
         self.popup.configure(background="white")
 
         self.popup.geometry(f"250x75")
