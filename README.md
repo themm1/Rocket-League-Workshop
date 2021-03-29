@@ -1,7 +1,7 @@
 # Rocket League Workshop
 
 ## What is it?
-Rocket League Workshop is a desktop app made with Tkinter, for loading and downloading Rocket League Workshop maps from steam workshop for those who play Rocket League on Epic Games.
+Rocket League Workshop is a desktop app made with Tkinter, for loading and downloading Rocket League Workshop maps from steam workshop.
 
 ## Installation
 To install the app you have to download setup at first.
@@ -17,7 +17,17 @@ You can also change the location and name of the `Map Files` directory by clicki
 ## Usage
 At first you have to download some maps by pasting their url to download box or by downloading them from the `Popular Maps`.
 All maps you download from the application are automatically added to your Map Files folder. To load map you have to switch to `Your Maps` and just click the load button right next to the map you want to play.  
-To actually play the map just play `Underpass` in freeplay maps and it's done!
+To actually play the map just select `Underpass` in freeplay maps in game and it's done!
+
+## Rocket League Workshop vs Custom Map Loader
+[Custom Map Loader](https://github.com/NoxPhoenix/custom-map-loader) is similar project for loading Rocket League workshop maps.  
+**Feature**                       | **RL Workshop**         | **Custom Map Loader**               
+ -------------------------------- | ----------------------- | ---------------------
+ **Loading maps**                 | ✓ Yes                   | ✓ Yes            
+ **Downloading Maps**             | ✓ Yes                   | ✗ No            
+ **Built in popular maps table**  | ✓ Yes                   | ✗ No  
+ **Map Picture**                  | ✗ No                    | ✓ Yes
+ **Size**                         | 14 MB                   | 130 MB 
 
 ## Examples
 ![Alt text](examples/example1.png "Your Maps example")
